@@ -14,15 +14,17 @@ class UserController extends Controller
     {
         $this->userRepo = $userRepo;
     }
-
     /**
      * Display a listing of the resource.
      */
-    public function index(): string
+    public function index()
     {
-        return response()->json([
-           'users' => json_decode($this->userRepo->getAllUsers())
-        ], 200);
+        $response = [
+            'users' => $this->userRepo->getAllUsers(),
+            'status' => 200
+        ];
+
+        return json_encode($response);
     }
 
     /**
@@ -30,8 +32,8 @@ class UserController extends Controller
      */
     public function store(Request $request): string
     {
-        return $this->userRepo->createUser();
-
+        $response = $this->userRepo->createUser();
+        return json_encode($response);
     }
 
     /**
@@ -39,7 +41,8 @@ class UserController extends Controller
      */
     public function show(string $id): string
     {
-        return $this->userRepo->getUserById($id);
+        $response = $this->userRepo->getUserById($id);
+        return json_encode($response);
     }
 
     /**
@@ -48,7 +51,8 @@ class UserController extends Controller
     public function update(string $id): string
     {
         $user = User::find($id);
-        return $this->userRepo->updateUser($user);
+        $response = $this->userRepo->updateUser($user);
+        return json_encode($response);
     }
 
     /**
@@ -57,6 +61,7 @@ class UserController extends Controller
     public function destroy(string $id): string
     {
         $user = User::find($id);
-        return $this->userRepo->deleteUser($user);
+        $response = $this->userRepo->deleteUser($user);
+        return json_encode($response);
     }
 }

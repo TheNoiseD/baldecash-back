@@ -16,68 +16,79 @@ class UserRepository implements UserRepositoryInterface
         $this->request = $request;
     }
 
-    public function getAllUsers(): string
+    public function getAllUsers(): array
     {
-        return User::with('role')->get();
+        return User::with('role')->get()->toArray();
     }
 
-    public function getUserById(int $id): string
+    public function getUserById(int $id): array
     {
         $user = User::find($id);
         $role = $user->role->name;
-        return response()->json([
+        if (!$user){
+            return [
+                'message' => 'User not found',
+                'status' => 404
+            ];
+        }
+        return [
             'user' => $user,
-            'role' => $role
-        ], 200);
+            'role' => $role,
+            'status' => 200
+        ];
     }
 
     public function createUser():string
     {
         $errors = $this->validateField(new User(),true);
         if($errors){
-            return response()->json([
+            return [
                 'message' => 'Validation failed',
-                'errors' => $errors
-            ], 400);
+                'errors' => $errors,
+                'status' => 400
+            ];
         }
         $user = new User();
         $user->fill($this->request->all('name', 'lastname', 'email', 'role_id'));
         $user->password = bcrypt($this->request->password);
         $user->save();
-        return response()->json([
+        return [
             'message' => 'User created successfully',
-            'user' => $user
-        ], 201);
-
+            'user' => $user,
+            'status' => 201
+        ];
     }
 
     public function updateUser(User $user):string
     {
         $errors = $this->validateField($user);
         if($errors){
-            return response()->json([
+            return [
                 'message' => 'Validation failed',
-                'errors' => $errors
-            ], 400);
+                'errors' => $errors,
+                'status' => 400
+            ];
         }
         $user->fill($this->request->all('name', 'lastname', 'email', 'role_id'));
         if ($this->request->password && strlen($this->request->password)>0){
             $user->password = bcrypt($this->request->password);
         }
         $user->save();
-        return response()->json([
+        return [
             'message' => 'User updated successfully',
-            'user' => $user
-        ], 200);
+            'user' => $user,
+            'status' => 200
+        ];
 
     }
 
     public function deleteUser(User $user): string
     {
         $user->delete();
-        return response()->json([
-            'message' => 'User deleted successfully'
-        ], 200);
+        return [
+            'message' => 'User deleted successfully',
+            'status' => 200
+        ];
     }
 
     private function validateField($user,$new=false): array
