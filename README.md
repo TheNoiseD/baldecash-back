@@ -1,4 +1,4 @@
-# Manual de Instalacion Test Evertec
+# Manual de Instalacion Test
 
 ### Requisitos
 
